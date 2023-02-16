@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  gabschart:
+  - apiVersion: v2
+    appVersion: 1.48.0
+    created: "2023-02-16T12:37:53.974206933Z"
+    description: A Helm chart for Kubernetes
+    digest: 27ec1b3cad26d7cc2c280d72e956d9898aa3cf892573363c5ceedadca5479286
+    name: gabschart
+    type: application
+    urls:
+    - https://github.com/jezor/coder-helm-charts/releases/download/gabschart-20.0.0/gabschart-20.0.0.tgz
+    version: 20.0.0
+generated: "2023-02-16T12:37:53.832450698Z"
