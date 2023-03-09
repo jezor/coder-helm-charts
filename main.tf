@@ -49,7 +49,7 @@ variable "home_storage_class_name" {
 
 variable "sidecar_disk_size" {
   type        = number
-  description = "How large would you like your sidecar volume to be (in GB)?"
+  description = "How large would you like your home volume to be (in GB)?"
   default     = 10
   validation {
     condition     = var.sidecar_disk_size >= 1
@@ -76,14 +76,14 @@ resource "coder_agent" "main" {
 
   login_before_ready     = false
   startup_script_timeout = 180
-  startup_script         = <<-EOF
-    #!/bin/sh
-    set -ex
-    sudo update-ca-certificates
+  startup_script         = <<-EOT
+    set -e
+
     # install and start code-server
-    curl -fsSL https://raw.githubusercontent.com/jezor/coder-helm-charts/f7cab4d129b1c41e66ee75f659a343e3f8e79f21/install.sh | sh -s -- --version 4.8.3
+    curl -fsSL -k https://raw.githubusercontent.com/jezor/coder-helm-charts/f7cab4d129b1c41e66ee75f659a343e3f8e79f21/install.sh | sh -s
+    touch /tmp/1marca.txt
     code-server --auth none --port 13337 &
-    EOF
+  EOT
 }
 
 # code-server
@@ -193,7 +193,7 @@ resource "kubernetes_pod" "main" {
     
     container {
       name              = "dev"
-      image             = "codercom/enterprise-java:ubuntu"
+      image             = "artifactory.warta.pl/okd-image/codercom/enterprise-java:latest"
       image_pull_policy = "Always"
       command           = ["sh", "-c", coder_agent.main.init_script]
       security_context {
@@ -215,6 +215,7 @@ resource "kubernetes_pod" "main" {
       volume_mount {
         mount_path = "/usr/local/share/ca-certificates"
         name       = "ca-certs"
+        read_only  = false
       }
     }
 
@@ -245,12 +246,8 @@ resource "kubernetes_pod" "main" {
       secret {
         secret_name = "coder-ca-bundle"
         items {
-                key = "ca1.crt"
-                path = "ca1.crt"
-          }
-        items {
-                key = "ca2.crt"
-                path = "ca2.crt"
+                key = "ca.crt"
+                path = "ca.crt"
           }
       }
     }
