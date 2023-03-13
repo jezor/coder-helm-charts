@@ -176,7 +176,7 @@ resource "kubernetes_pod" "main" {
     
     container {
       name              = "dev"
-      image             = "artifactory.warta.pl/okd-image/codercom/enterprise-java:latest"
+      image             = "artifactory.warta.pl/okd-image/codercom/enterprise-java:ubuntu"
       image_pull_policy = "Always"
       command           = ["sh", "-c", coder_agent.main.init_script]
       security_context {
