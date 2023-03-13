@@ -162,13 +162,9 @@ resource "kubernetes_pod" "main" {
       name              = "dev"
       image             = "artifactory.warta.pl/okd-image/codercom/enterprise-java:latest"
       image_pull_policy = "Always"
-      command           = ["sh", "-c", coder_agent.main.init_script]
+      command           = ["sh", "-c"]
       security_context {
         run_as_user = "1000"
-      }
-      env {
-        name  = "CODER_AGENT_TOKEN"
-        value = coder_agent.main.token
       }
       env {
         name  = "DOCKER_HOST"
