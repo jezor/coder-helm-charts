@@ -70,39 +70,6 @@ provider "kubernetes" {
 
 data "coder_workspace" "me" {}
 
-resource "coder_agent" "main" {
-  os   = "linux"
-  arch = "amd64"
-
-  login_before_ready     = false
-  startup_script_timeout = 180
-  startup_script         = <<-EOT
-    set -e
-
-    # install and start code-server
-    curl -fsSL -k https://raw.githubusercontent.com/jezor/coder-helm-charts/f7cab4d129b1c41e66ee75f659a343e3f8e79f21/install.sh | sh -s
-    touch /tmp/1marca.txt
-    code-server --auth none --port 13337 &
-  EOT
-}
-
-# code-server
-resource "coder_app" "code-server" {
-  agent_id     = coder_agent.main.id
-  slug         = "code-server"
-  display_name = "code-server"
-  icon         = "/icon/code.svg"
-  url          = "http://localhost:13337?folder=/home/coder"
-  subdomain    = false
-  share        = "owner"
-
-  healthcheck {
-    url       = "http://localhost:13337/healthz"
-    interval  = 3
-    threshold = 10
-  }
-}
-
 resource "kubernetes_persistent_volume_claim" "home" {
   metadata {
     name      = "coder-${lower(data.coder_workspace.me.owner)}-${lower(data.coder_workspace.me.name)}-home"
@@ -193,7 +160,7 @@ resource "kubernetes_pod" "main" {
     
     container {
       name              = "dev"
-      image             = "docker.io/jezor/enterprise-java:ubuntu"
+      image             = "artifactory.warta.pl/okd-image/codercom/enterprise-java:latest"
       image_pull_policy = "Always"
       command           = ["sh", "-c", coder_agent.main.init_script]
       security_context {
