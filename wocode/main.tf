@@ -162,7 +162,7 @@ resource "kubernetes_pod" "main" {
       name              = "dev"
       image             = "artifactory.warta.pl/okd-image/codercom/enterprise-java:latest"
       image_pull_policy = "Always"
-      command           = ["echo hello"]
+      command           = ["sh", "-c", "ls"]
       security_context {
         run_as_user = "1000"
       }
